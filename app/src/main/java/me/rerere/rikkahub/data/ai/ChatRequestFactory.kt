@@ -14,6 +14,7 @@ import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ProviderManager
 import me.rerere.ai.provider.ProviderSetting
 import me.rerere.ai.provider.TextGenerationParams
+import me.rerere.ai.provider.supportsFastMode
 import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.limitContext
 import me.rerere.rikkahub.R
@@ -243,6 +244,8 @@ class ChatRequestFactory(
             maxTokens = assistant.maxTokens,
             tools = turn.tools,
             reasoningLevel = assistant.reasoningLevel,
+            // 换到不支持的模型时开关仍留在助手上，只是不再带给请求
+            fastMode = assistant.fastMode && turn.providerSetting.supportsFastMode(turn.model),
             customHeaders = buildList {
                 addAll(assistant.customHeaders)
                 addAll(turn.model.customHeaders)

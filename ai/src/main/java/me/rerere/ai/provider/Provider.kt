@@ -71,6 +71,8 @@ data class TextGenerationParams(
     val maxTokens: Int? = null,
     val tools: List<Tool> = emptyList(),
     val reasoningLevel: ReasoningLevel = ReasoningLevel.OFF,
+    // 快速模式：更高的输出速度和价格，调用方只在 [supportsFastMode] 的模型上开启
+    val fastMode: Boolean = false,
     val customHeaders: List<CustomHeader> = emptyList(),
     val customBody: List<CustomBody> = emptyList(),
     val sessionId: String? = Uuid.random().toString(),

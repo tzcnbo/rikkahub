@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import me.rerere.ai.registry.ModelRegistry
 import kotlin.uuid.Uuid
 
 /** 账号登录得到的 OAuth 凭据 */
@@ -47,6 +48,19 @@ val ProviderSetting.supportsBuiltInSearch: Boolean
         is ProviderSetting.Claude -> true
         is ProviderSetting.Account -> true
     }
+
+/**
+ * 模型能否开启快速模式（[TextGenerationParams.fastMode]）。
+ *
+ * - Claude：请求带 `speed: "fast"`，只有部分 Opus 支持，其他模型带上会报错
+ * - OpenAI 兼容和 ChatGPT 账号：请求带 `service_tier: "priority"`，只对 GPT 系列开放，
+ *   其他厂商的兼容接口不一定认这个值
+ */
+fun ProviderSetting.supportsFastMode(model: Model): Boolean = when (this) {
+    is ProviderSetting.Claude -> ModelRegistry.CLAUDE_FAST_MODE.match(model.modelId)
+    is ProviderSetting.OpenAI, is ProviderSetting.ChatGPT -> ModelRegistry.OPENAI_FAST_MODE.match(model.modelId)
+    else -> false
+}
 
 @Serializable
 sealed class ProviderSetting {

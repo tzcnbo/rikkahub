@@ -1784,4 +1784,7 @@
   <string name="setting_model_page_memory_model">Erinnerungskonsolidierungsmodell</string>
   <string name="setting_model_page_memory_model_desc">Modell, das Konversationen im Hintergrund in langfristige Erinnerungen organisiert; verwendet das schnelle Modell, wenn nicht festgelegt</string>
   <string name="setting_model_page_memory_model_follow_fast">Wie das schnelle Modell</string>
+  <string name="chat_input_fast_mode">Schnellmodus</string>
+  <string name="chat_input_fast_mode_enabled">Schnellmodus an: schnellere Ausgabe, höherer Preis</string>
+  <string name="chat_input_fast_mode_disabled">Schnellmodus aus</string>
 </resources>

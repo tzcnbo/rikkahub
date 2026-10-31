@@ -83,16 +83,19 @@ import kotlinx.coroutines.flow.collectLatest
 import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ModelAbility
 import me.rerere.ai.provider.ModelType
+import me.rerere.ai.provider.supportsFastMode
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.asr.ASRStatus
 import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.Add01
 import me.rerere.hugeicons.stroke.ArrowUp02
 import me.rerere.hugeicons.stroke.Cancel01
+import me.rerere.hugeicons.stroke.DashboardSpeed02
 import me.rerere.hugeicons.stroke.Fullscreen
 import me.rerere.hugeicons.stroke.Zap
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.data.datastore.Settings
+import me.rerere.rikkahub.data.datastore.findProvider
 import me.rerere.rikkahub.data.datastore.getQuickMessagesOfAssistant
 import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.data.model.Assistant
@@ -112,6 +115,7 @@ import me.rerere.rikkahub.ui.context.LocalSettings
 import me.rerere.rikkahub.ui.context.LocalToaster
 import me.rerere.rikkahub.ui.hooks.ChatInputState
 import me.rerere.rikkahub.utils.SoundEffectPlayer
+import me.rerere.ui.components.ToggleSurface
 import org.koin.compose.koinInject
 import me.rerere.rikkahub.ui.pages.chat.VoicePhase
 import me.rerere.rikkahub.ui.pages.chat.VoiceSessionState
@@ -161,6 +165,9 @@ fun ChatInput(
         providers = settings.providers,
         type = ModelType.CHAT,
     )
+    val supportsFastMode = remember(chatModel, settings.providers) {
+        chatModel != null && chatModel.findProvider(settings.providers)?.supportsFastMode(chatModel) == true
+    }
 
     fun sendMessage() {
         focusManager.clearFocus(force = true)
@@ -305,6 +312,16 @@ fun ChatInput(
                                 )
                             }
 
+                            // Fast mode
+                            if (supportsFastMode) {
+                                FastModeButton(
+                                    fastMode = assistant.fastMode,
+                                    onUpdateFastMode = {
+                                        onUpdateAssistant(assistant.copy(fastMode = it))
+                                    },
+                                )
+                            }
+
                         }
 
                         ActionIconButton(
@@ -413,6 +430,36 @@ private fun SendButton(
             tint = contentColor,
             modifier = Modifier.size(18.dp)
         )
+    }
+}
+
+@Composable
+private fun FastModeButton(
+    fastMode: Boolean,
+    onUpdateFastMode: (Boolean) -> Unit,
+) {
+    val toaster = LocalToaster.current
+    val enabledMessage = stringResource(R.string.chat_input_fast_mode_enabled)
+    val disabledMessage = stringResource(R.string.chat_input_fast_mode_disabled)
+    ToggleSurface(
+        checked = fastMode,
+        onClick = {
+            onUpdateFastMode(!fastMode)
+            // 快速模式按更高的价格计费，切换时提示一下
+            toaster.show(message = if (fastMode) disabledMessage else enabledMessage, type = ToastType.Info)
+        },
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(8.dp)
+                .size(24.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = HugeIcons.DashboardSpeed02,
+                contentDescription = stringResource(R.string.chat_input_fast_mode),
+            )
+        }
     }
 }
 

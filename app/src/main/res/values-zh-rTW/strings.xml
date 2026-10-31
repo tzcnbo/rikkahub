@@ -1781,4 +1781,7 @@
   <string name="setting_model_page_memory_model">記憶整理模型</string>
   <string name="setting_model_page_memory_model_desc">用於在背景將對話整理為長期記憶的模型；未設定時會使用快速模型</string>
   <string name="setting_model_page_memory_model_follow_fast">跟隨快速模型</string>
+  <string name="chat_input_fast_mode">快速模式</string>
+  <string name="chat_input_fast_mode_enabled">已開啟快速模式：輸出更快，按更高價格計費</string>
+  <string name="chat_input_fast_mode_disabled">已關閉快速模式</string>
 </resources>

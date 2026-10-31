@@ -1783,4 +1783,7 @@
   <string name="setting_model_page_memory_model">Модель консолидации памяти</string>
   <string name="setting_model_page_memory_model_desc">Модель, которая организует диалоги в долговременную память в фоновом режиме; если не задана, используется быстрая модель</string>
   <string name="setting_model_page_memory_model_follow_fast">Как у быстрой модели</string>
+  <string name="chat_input_fast_mode">Быстрый режим</string>
+  <string name="chat_input_fast_mode_enabled">Быстрый режим включён: ответы быстрее, тарификация выше</string>
+  <string name="chat_input_fast_mode_disabled">Быстрый режим выключен</string>
 </resources>

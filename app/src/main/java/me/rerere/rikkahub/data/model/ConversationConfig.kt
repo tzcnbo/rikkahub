@@ -21,6 +21,7 @@ import kotlin.uuid.Uuid
 data class ConversationConfig(
     val chatModelId: Uuid? = null,
     val reasoningLevel: ReasoningLevel = ReasoningLevel.AUTO,
+    val fastMode: Boolean = false,
     val enableWebSearch: Boolean = false,
     val builtInSearch: Boolean = false, // 模型内置搜索，覆盖模型自身的开关
     val mcpServers: Set<Uuid> = emptySet(),
@@ -32,6 +33,7 @@ data class ConversationConfig(
 private fun Assistant.toConversationConfig() = ConversationConfig(
     chatModelId = chatModelId,
     reasoningLevel = reasoningLevel,
+    fastMode = fastMode,
     enableWebSearch = enableWebSearch,
     mcpServers = mcpServers,
     workspaceId = workspaceId,
@@ -41,6 +43,7 @@ private fun Assistant.toConversationConfig() = ConversationConfig(
 private fun Assistant.withConversationConfig(config: ConversationConfig) = copy(
     chatModelId = config.chatModelId,
     reasoningLevel = config.reasoningLevel,
+    fastMode = config.fastMode,
     enableWebSearch = config.enableWebSearch,
     mcpServers = config.mcpServers,
     workspaceId = config.workspaceId,

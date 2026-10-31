@@ -257,6 +257,9 @@ class ChatCompletionsAPI(
                 }
             }
 
+            // 快速模式（原 Priority processing）
+            if (params.fastMode) put("service_tier", "priority")
+
             // open router适配
             if(isOpenRouter) {
                 params.sessionId?.let { put("session_id", it) }

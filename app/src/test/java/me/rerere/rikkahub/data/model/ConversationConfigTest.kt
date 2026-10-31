@@ -25,6 +25,7 @@ class ConversationConfigTest {
     private val assistant = Assistant(
         chatModelId = modelA.id,
         reasoningLevel = ReasoningLevel.HIGH,
+        fastMode = true,
         enableWebSearch = true,
         mcpServers = setOf(mcpServer),
         workspaceId = workspace,
@@ -64,6 +65,7 @@ class ConversationConfigTest {
             ConversationConfig(
                 chatModelId = modelA.id,
                 reasoningLevel = ReasoningLevel.HIGH,
+                fastMode = true,
                 enableWebSearch = true,
                 builtInSearch = true,
                 mcpServers = setOf(mcpServer),
@@ -93,6 +95,7 @@ class ConversationConfigTest {
         val changed = assistant.copy(
             chatModelId = modelB.id,
             reasoningLevel = ReasoningLevel.OFF,
+            fastMode = false,
             enableWebSearch = false,
             mcpServers = emptySet(),
             workspaceId = null,

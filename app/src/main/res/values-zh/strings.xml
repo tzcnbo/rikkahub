@@ -1786,4 +1786,7 @@ mDNS 地址：使用 .local 主机名，同一网络中的其他设备可通过�
   <string name="setting_model_page_memory_model">记忆整理模型</string>
   <string name="setting_model_page_memory_model_desc">用于在后台将对话整理为长期记忆的模型；未设置时使用快速模型</string>
   <string name="setting_model_page_memory_model_follow_fast">跟随快速模型</string>
+  <string name="chat_input_fast_mode">快速模式</string>
+  <string name="chat_input_fast_mode_enabled">已开启快速模式：输出更快，按更高价格计费</string>
+  <string name="chat_input_fast_mode_disabled">已关闭快速模式</string>
 </resources>

@@ -72,6 +72,7 @@ import me.rerere.ai.util.stringSafe
 import me.rerere.common.http.await
 import me.rerere.common.http.jsonPrimitiveOrNull
 import me.rerere.common.http.sse.newEventSource
+import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -83,6 +84,10 @@ import kotlin.time.Clock
 
 private const val TAG = "ClaudeProvider"
 private const val ANTHROPIC_VERSION = "2023-06-01"
+private const val ANTHROPIC_BETA = "anthropic-beta"
+
+// Opus 5.5 以外的模型上快速模式还是 research preview，要带这个 beta 标记
+private const val FAST_MODE_BETA = "fast-mode-2026-02-01"
 private const val CLAUDE_PAUSE_TURN = "pause_turn"
 private const val MAX_PAUSE_TURN_CONTINUATIONS = 5
 
@@ -233,6 +238,19 @@ private fun StreamChunk.maxClaudeServerToolIndex(): Int? {
 
 private fun ServerToolMetadata.maxIndex(): Int? = listOfNotNull(callIndex, resultIndex).maxOrNull()
 
+/** 消息请求的自定义请求头；开启快速模式时追加 beta 标记，用户自己配置的 anthropic-beta 一并保留 */
+internal fun ProviderSetting.Claude.messageRequestHeaders(params: TextGenerationParams): Headers {
+    val headers = mergeCustomHeaders(params.customHeaders)
+    if (!params.fastMode) return headers
+    val betas = headers.values(ANTHROPIC_BETA)
+        .flatMap { it.split(',') }
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
+    return headers.newBuilder()
+        .set(ANTHROPIC_BETA, (betas + FAST_MODE_BETA).distinct().joinToString(","))
+        .build()
+}
+
 class ClaudeProvider(private val client: OkHttpClient, context: Context? = null) : Provider<ProviderSetting.Claude> {
     private val keyRoulette = if (context != null) KeyRoulette.lru(context) else KeyRoulette.default()
 
@@ -297,7 +315,7 @@ class ClaudeProvider(private val client: OkHttpClient, context: Context? = null)
         val requestBody = buildMessageRequest(providerSetting, messages, params)
         val request = Request.Builder()
             .url("${providerSetting.baseUrl}/messages")
-            .headers(providerSetting.mergeCustomHeaders(params.customHeaders))
+            .headers(providerSetting.messageRequestHeaders(params))
             .post(json.encodeToString(requestBody).toRequestBody("application/json".toMediaType()))
             .addHeader("x-api-key", keyRoulette.next(providerSetting.apiKey, providerSetting.id.toString()))
             .addHeader("anthropic-version", ANTHROPIC_VERSION)
@@ -347,7 +365,7 @@ class ClaudeProvider(private val client: OkHttpClient, context: Context? = null)
         val requestBody = buildMessageRequest(providerSetting, messages, params, stream = true)
         val request = Request.Builder()
             .url("${providerSetting.baseUrl}/messages")
-            .headers(providerSetting.mergeCustomHeaders(params.customHeaders))
+            .headers(providerSetting.messageRequestHeaders(params))
             .post(json.encodeToString(requestBody).toRequestBody("application/json".toMediaType()))
             .addHeader("x-api-key", keyRoulette.next(providerSetting.apiKey, providerSetting.id.toString()))
             .addHeader("anthropic-version", ANTHROPIC_VERSION)
@@ -453,6 +471,9 @@ class ClaudeProvider(private val client: OkHttpClient, context: Context? = null)
             if (params.topP != null) put("top_p", params.topP)
 
             put("stream", stream)
+
+            // 快速模式：同一模型更快的输出速度，按更高的价格计费
+            if (params.fastMode) put("speed", "fast")
 
             // system prompt
             val systemMessage = messages.firstOrNull { it.role == MessageRole.SYSTEM }

@@ -280,6 +280,30 @@ object ModelRegistry {
         )
     }
 
+    // 支持快速模式（speed: fast）的 Claude 模型，其他模型带上会报错
+    // https://platform.claude.com/docs/en/build-with-claude/fast-mode
+    val CLAUDE_FAST_MODE = defineGroup {
+        add(CLAUDE_OPUS_4_8, CLAUDE_OPUS_5, CLAUDE_OPUS_5_5)
+    }
+
+    // 可以请求快速模式（service_tier: priority）的 GPT 模型
+    // https://developers.openai.com/api/docs/guides/fast-mode
+    val OPENAI_FAST_MODE = defineGroup {
+        add(
+            GPT4O,
+            GPT_4_1,
+            OPENAI_O_MODELS,
+            GPT_5,
+            GPT_5_1,
+            GPT_5_2,
+            GPT_5_3,
+            GPT_5_4,
+            GPT_5_5,
+            GPT_5_6,
+            GPT_6
+        )
+    }
+
     private val DEEPSEEK_V3_MODEL = defineModel {
         tokens("deepseek", "v", "3")
         toolAbility()
